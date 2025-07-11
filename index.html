@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🧙‍♂️ Venom Config Master</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body id="app" class="transition-all duration-300 bg-white text-black text-base min-h-screen flex items-center justify-center px-4">
+
+  <div class="max-w-xl w-full space-y-6 bg-white p-6 rounded-xl shadow-2xl" id="config-panel">
+    <h1 class="text-3xl font-bold text-center text-indigo-700">🧙‍♂️ Venom Config Master</h1>
+
+    <form id="config-form" class="space-y-4">
+      <div>
+        <label class="block font-semibold">Background Color</label>
+        <input type="color" name="backgroundColor" value="#ffffff" class="w-full h-10 rounded border p-1" />
+      </div>
+
+      <div>
+        <label class="block font-semibold">Text Color</label>
+        <input type="color" name="textColor" value="#000000" class="w-full h-10 rounded border p-1" />
+      </div>
+
+      <div>
+        <label class="block font-semibold">Font Size</label>
+        <select name="fontSize" class="w-full p-2 border rounded">
+          <option value="text-sm">Small</option>
+          <option value="text-base" selected>Medium</option>
+          <option value="text-lg">Large</option>
+          <option value="text-xl">Extra Large</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block font-semibold">Theme</label>
+        <select name="theme" class="w-full p-2 border rounded">
+          <option value="light" selected>Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </div>
+
+      <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded">💾 Apply Config</button>
+    </form>
+
+    <div class="flex justify-between gap-2">
+      <button id="export-btn" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded">⬇️ Export</button>
+      <input type="file" id="import-file" accept=".venomcfg" class="flex-1 bg-gray-100 py-2 text-center rounded file:hidden cursor-pointer text-sm" />
+    </div>
+    <button id="reset-btn" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded mt-4">🗑️ Reset Config</button>
+
+  </div>
+
+  <script>
+    const form = document.getElementById("config-form");
+    const app = document.getElementById("app");
+    const panel = document.getElementById("config-panel");
+    const exportBtn = document.getElementById("export-btn");
+    const importFile = document.getElementById("import-file");
+
+    const SECRET_KEY = "VENOM_SUPREME_1337";
+
+    function encodeVenom(data) {
+      return btoa(SECRET_KEY + "::" + JSON.stringify(data));
+    }
+
+    function decodeVenom(encoded) {
+      const raw = atob(encoded);
+      if (!raw.startsWith(SECRET_KEY + "::")) throw new Error("Invalid config file.");
+      return JSON.parse(raw.split("::")[1]);
+    }
+
+    function applyStyles(config) {
+      app.style.backgroundColor = config.backgroundColor;
+      app.style.color = config.textColor;
+      app.className = `transition-all duration-300 min-h-screen flex items-center justify-center px-4 ${config.fontSize}`;
+
+      // Theme toggle
+      if (config.theme === "dark") {
+        panel.classList.remove("bg-white", "text-black");
+        panel.classList.add("bg-gray-900", "text-white");
+      } else {
+        panel.classList.remove("bg-gray-900", "text-white");
+        panel.classList.add("bg-white", "text-black");
+      }
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const config = {
+        backgroundColor: formData.get("backgroundColor"),
+        textColor: formData.get("textColor"),
+        fontSize: formData.get("fontSize"),
+        theme: formData.get("theme")
+      };
+      applyStyles(config);
+      localStorage.setItem("venomConfig", encodeVenom(config));
+      alert("✅ Config applied and saved!");
+    });
+
+    exportBtn.addEventListener("click", () => {
+      const config = {
+        backgroundColor: form.backgroundColor.value,
+        textColor: form.textColor.value,
+        fontSize: form.fontSize.value,
+        theme: form.theme.value
+      };
+      const encoded = encodeVenom(config);
+      const blob = new Blob([encoded], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "config.venomcfg";
+      link.click();
+    });
+
+    importFile.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const config = decodeVenom(ev.target.result);
+          form.backgroundColor.value = config.backgroundColor;
+          form.textColor.value = config.textColor;
+          form.fontSize.value = config.fontSize;
+          form.theme.value = config.theme;
+          applyStyles(config);
+          alert("📥 Config imported and applied!");
+        } catch (err) {
+          alert("❌ Import failed: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    // Load config from localStorage if it exists
+    window.addEventListener("DOMContentLoaded", () => {
+      const stored = localStorage.getItem("venomConfig");
+      if (stored) {
+        try {
+          const config = decodeVenom(stored);
+          form.backgroundColor.value = config.backgroundColor;
+          form.textColor.value = config.textColor;
+          form.fontSize.value = config.fontSize;
+          form.theme.value = config.theme;
+          applyStyles(config);
+        } catch (e) {
+          console.warn("Failed to load local config.");
+        }
+      }
+    });
+
+    const resetBtn = document.getElementById("reset-btn");
+
+resetBtn.addEventListener("click", () => {
+  if (!confirm("⚠️ Are you sure you want to reset everything?")) return;
+
+  // Reset form values
+  form.reset();
+  form.backgroundColor.value = "#ffffff";
+  form.textColor.value = "#000000";
+  form.fontSize.value = "text-base";
+  form.theme.value = "light";
+
+  // Reset styles
+  app.style.backgroundColor = "#ffffff";
+  app.style.color = "#000000";
+  app.className = `transition-all duration-300 min-h-screen flex items-center justify-center px-4 text-base`;
+
+  // Reset config panel to light mode
+  panel.classList.remove("bg-gray-900", "text-white");
+  panel.classList.add("bg-white", "text-black");
+
+  // Clear localStorage
+  localStorage.removeItem("venomConfig");
+
+  alert("🧹 Config reset to default!");
+});
+
+  </script>
+</body>
+</html>
