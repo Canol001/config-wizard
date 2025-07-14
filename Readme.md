@@ -55,7 +55,7 @@ README.md         # You're looking at it 😎
 To change the internal signature (secret key), edit this line in the JS:
 
 ```js
-const SECRET_KEY = "VENOM_SUPREME_1337";
+const SECRET_KEY = "VENOM_SUPREME_LEGEND_1337";
 ```
 
 Only configs signed with this key will work. 🛡️
