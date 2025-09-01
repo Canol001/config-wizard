@@ -9,7 +9,7 @@ A slick, single-page web app to build, live-preview, export, import, and reset c
 - 📥 Import and apply previously exported configs
 - 💾 LocalStorage saves your last config automatically
 - 🧹 Reset button restores default styles & clears all settings
-- 💻 Built with vanilla JavaScript + TailwindCSS
+- 💻 Built with vanilla JavaScript + TailwindCSS.
 - 🛡️ Config files are encoded with a secret key so only your site can use them
 
 ---
