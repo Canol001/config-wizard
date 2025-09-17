@@ -14,7 +14,7 @@ A slick, single-page web app to build, live-preview, export, import, and reset c
 
 ---
 
-## 📁 Project Structure
+## 📁 Project Structure,
 
 ```plaintext
 index.html        # The full app — one file does it all
