@@ -1,4 +1,4 @@
-# 🧙‍♂️ Venom Config Master
+# 🧙‍♂️ Venom Config Master.
 
 A slick, single-page web app to build, live-preview, export, import, and reset custom UI configurations — all without external dependencies. Powered by Tailwind CSS and a hint of dark magic 🪄
 
